@@ -1,0 +1,67 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>weblink</title>
+    <link rel="manifest" href="/weblink.webmanifest">
+    <style>
+      body {
+        background-color: #3f9cff;
+        color: white;
+      }
+      h1 {
+        align-items: center;
+        display: flex;
+        font-family: sans-serif;
+        font-size: 8em;
+        justify-content: center;
+        height: 100%;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>weblink</h1>
+    <script>
+      function connect({ client_addr, server_addr }) {
+        const client = new WebSocket(client_addr + "/client");
+        const server = new WebSocket(server_addr + "/server");
+
+        server.onerror = function(event) { console.error("server/error"); };
+        client.onerror =  function(event) { console.error("client/error"); };
+
+        client.onopen = function() {
+          server.onopen = function() {
+            client.onmessage = function(msg) { server.send(msg.data); };
+            server.onmessage = function(msg) { client.send(msg.data); };
+          };
+        };
+
+        server.onclose = function(event) {
+          console.log("server/close", event.code, event.reason);
+
+          if (client.readyState === WebSocket.OPEN) client.close();
+        };
+
+        client.onclose = function(event) {
+          console.log("client/close", event.code, event.reason);
+
+          if (server.readyState === WebSocket.OPEN) server.close();
+        };
+      }
+
+      const url = new URL(location.href);
+      const client_addr = `ws://${location.hostname}:8000`;
+      const server_addr = url.searchParams.get("server") || "wss://weblinkapp.herokuapp.com";
+      const batch_size = Number(url.searchParams.get("batch")) || 4
+      const control = new WebSocket(client_addr + "/control");
+
+      control.onerror = function(event) { console.error("control/error"); };
+      control.onclose = function(event) { console.log("control/close"); };
+      control.onmessage = function(msg) {
+        for (var i = 0; i < batch_size; i++) {
+          connect({ client_addr, server_addr });
+        }
+      };
+      control.onmessage();
+    </script>
+  </body>
+</html>
