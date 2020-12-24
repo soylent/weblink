@@ -5,9 +5,17 @@ Simply, start weblink and connect your device to it.
 
 <img src="weblink.png" alt="weblink" align="right" width="40%">
 
-weblink requires ruby to run. If you are on Windows, go to rubyinstaller.org,
-download *ruby+devkit* and install it. You need version 2.5 or higher. Then open
-command prompt and follow the instructions bellow.
+## Installation
+
+1. (Windows only) weblink requires ruby to run. If you are on Windows, go to
+   rubyinstaller.org, download *ruby+devkit* and install it. You need version
+   2.5 or higher. Then open Command Prompt and follow the instructions bellow.
+
+1. (Windows only) Install eventmachine
+
+   ```
+   gem install eventmachine --platform=ruby
+   ```
 
 1. Install weblink
 

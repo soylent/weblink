@@ -16,7 +16,7 @@ class Weblink
 
     if @opts[:client]
       public = File.expand_path('../public', __dir__)
-      spawn('ruby', '-run', '-ehttpd', '--', public, err: '/dev/null')
+      spawn('ruby', '-run', '-ehttpd', '--', public, err: IO::NULL)
 
       ip = Socket.getifaddrs.find { |ifa| ifa.addr.ipv4_private? }
       puts "Open http://#{ip.addr.ip_address}:8080/ on your other device." if ip
