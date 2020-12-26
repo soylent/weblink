@@ -3,6 +3,7 @@ require 'time'
 
 class Relay < EventMachine::Connection
   def initialize(tag, xff = nil)
+    super
     pause
     @tag = tag
     @xff = xff

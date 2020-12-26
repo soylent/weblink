@@ -1,7 +1,9 @@
-1.0.1
+1.1.0
 
 * Works on Windows
+* HTTPS proxy support
 
 1.0.0
 
 * First public release
+* SOCKS5 proxy support

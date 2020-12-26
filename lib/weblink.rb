@@ -7,7 +7,8 @@ require 'relay'
 class Weblink
   def initialize(opts)
     @opts = opts
-    @proxxxy_socket = Tempfile.new('weblink')
+    @https = Tempfile.new('weblink')
+    @socks5 = Tempfile.new('weblink')
     @websockets = EventMachine::Queue.new
   end
 
@@ -24,7 +25,7 @@ class Weblink
 
     if @opts[:server]
       begin
-        spawn('proxxxy', "socks5://#{@proxxxy_socket.path}")
+        spawn('proxxxy', "https://#{@https.path}", "socks5://#{@socks5.path}")
       rescue Errno::ENOENT
         abort('Please install proxxxy v2 to run weblink server')
       end
@@ -38,8 +39,10 @@ class Weblink
           puts 'Ready'
         when '/client'
           @websockets.push(ws)
-        when '/server'
-          proxy(ws, handshake)
+        when '/proxy/socks5'
+          proxy(ws, handshake, @socks5.path)
+        when '/proxy/https'
+          proxy(ws, handshake, @https.path)
         else
           warn("Unexpected request: #{handshake.path.inspect}")
         end
@@ -53,20 +56,20 @@ class Weblink
     host, port = @opts.values_at(:proxy_host, :proxy_port)
     sig = EventMachine.start_server(host, port, Relay, 'client') do |rel|
       # Dogpile effect
-      control_ws.send_text('more_ws') if @websockets.size < min_ws_num
+      control_ws.send_text(@opts[:proxy_type]) if @websockets.size < min_ws_num
       @websockets.pop { |ws| rel.start(ws) }
     end
     control_ws.onclose { EventMachine.stop_server(sig) }
   end
 
-  def proxy(ws, handshake)
+  def proxy(ws, handshake, socket)
     unless @opts[:server]
       warn 'weblink server is disabled'
       return
     end
     xff = handshake.headers_downcased['x-forwarded-for']
     with_retry(3) do
-      EventMachine.connect(@proxxxy_socket.path, Relay, 'server', xff) do |rel|
+      EventMachine.connect(socket, Relay, 'server', xff) do |rel|
         rel.start(ws)
       end
     end
