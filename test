@@ -25,7 +25,7 @@ firefox "http://127.0.0.1:8080/?server=ws://127.0.0.1:8000&batch=2"
 
 # Test that everything works
 for _ in $(seq 1 3); do
-  (curl_with_retry --proxy socks5h://127.0.0.1:1080 https://www.google.com/ && echo "SUCCESS" || echo "FAILURE") &
+  (curl_with_retry -px http://127.0.0.1:3128 https://www.google.com/ && echo "SUCCESS" || echo "FAILURE") &
   pids="$! $pids"
 done
 wait $pids

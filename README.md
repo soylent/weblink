@@ -36,11 +36,17 @@ Simply, start weblink and connect your device to it.
 
    |||
    |---|---|
-   | type | `SOCKS5` |
+   | type | `HTTPS` |
    | host | `127.0.0.1` |
-   | port | `1080` |
+   | port | `3128` |
 
    It's highly recommended to let the proxy resolve domain names.
+
+   To test it, you can run:
+
+   ```
+   curl -px http://127.0.0.1:3128 https://www.google.com/
+   ```
 
 ## Development
 

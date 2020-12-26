@@ -1,5 +1,4 @@
 #!/usr/bin/env -S ruby -w
-# frozen_string_literal: true
 
 $LOAD_PATH.unshift File.expand_path('../lib', __dir__)
 
@@ -35,11 +34,16 @@ op = OptionParser.new do |op|
     opts[:port] = port
   end
 
+  op.on('--proxy-type TYPE', String, 'https or socks5 (default: https)') do |type|
+    raise OptionParser::InvalidArgument, type unless type == 'https' || type == 'socks5'
+    opts[:proxy_type] = type
+  end
+
   op.on('--proxy-host HOST', String, 'Address to bind proxy to(default: 0.0.0.0)') do |host|
     opts[:proxy_host] = host
   end
 
-  op.on('--proxy-port PORT', Integer, 'Use proxy PORT (default: 1080)') do |port|
+  op.on('--proxy-port PORT', Integer, 'Use proxy PORT (default: 3128)') do |port|
     opts[:proxy_port] = port
   end
 
@@ -66,8 +70,9 @@ else
   end
   opts[:host] ||= '0.0.0.0'
   opts[:port] ||= 8000
+  opts[:proxy_type] ||= 'https'
   opts[:proxy_host] ||= '0.0.0.0'
-  opts[:proxy_port] ||= 1080
+  opts[:proxy_port] ||= 3128
 end
 
 weblink = Weblink.new(opts)

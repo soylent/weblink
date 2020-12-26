@@ -24,30 +24,30 @@
   <body>
     <h1>weblink</h1>
     <script>
-      function connect(client_addr, server_addr) {
-        var client = new WebSocket(client_addr + "/client");
-        var server = new WebSocket(server_addr + "/server");
+      function connect(client_addr, server_addr, proxy) {
+        var client, server = new WebSocket(server_addr + "/proxy/" + proxy);
 
         server.onerror = function(event) { console.error("server/error"); };
-        client.onerror =  function(event) { console.error("client/error"); };
 
-        client.onopen = function() {
-          server.onopen = function() {
+        server.onopen = function() {
+          client = new WebSocket(client_addr + "/client");
+
+          client.onerror =  function(event) { console.error("client/error"); };
+
+          client.onopen = function() {
             client.onmessage = function(msg) { server.send(msg.data); };
             server.onmessage = function(msg) { client.send(msg.data); };
+          };
+
+          client.onclose = function(event) {
+            console.log("client/close", event.code, event.reason);
+            if (server.readyState === WebSocket.OPEN) server.close();
           };
         };
 
         server.onclose = function(event) {
           console.log("server/close", event.code, event.reason);
-
           if (client.readyState === WebSocket.OPEN) client.close();
-        };
-
-        client.onclose = function(event) {
-          console.log("client/close", event.code, event.reason);
-
-          if (server.readyState === WebSocket.OPEN) server.close();
         };
       }
 
@@ -58,15 +58,16 @@
 
       var client_addr = "ws://" + location.hostname + ":8000";
       var server_addr = params.server || "wss://weblinkapp.herokuapp.com";
-      var batch_size = Number(params.batch) || 4
+      var batch_size = Number(params.batch) || 4;
       var control = new WebSocket(client_addr + "/control");
 
       control.onerror = function(event) { console.error("control/error"); };
       control.onclose = function(event) { console.log("control/close"); };
       control.onmessage = function(msg) {
-        for (var i = 0; i < batch_size; i++) connect(client_addr, server_addr);
+        for (var i = 0; i < batch_size; i++) {
+          connect(client_addr, server_addr, msg.data);
+        }
       };
-      control.onmessage();
     </script>
   </body>
 </html>
