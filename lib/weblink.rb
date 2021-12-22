@@ -68,14 +68,14 @@ class Weblink
       return
     end
     xff = handshake.headers_downcased['x-forwarded-for']
-    with_retry(3) do
+    with_retry(timeout: 3) do
       EventMachine.connect(socket, Relay, 'server', xff) do |rel|
         rel.start(ws)
       end
     end
   end
 
-  def with_retry(timeout, wait: 0.1)
+  def with_retry(timeout:, wait: 0.1)
     elapsed = 0
     begin
       yield
