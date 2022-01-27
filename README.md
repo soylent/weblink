@@ -30,15 +30,16 @@ Simply, start weblink and connect your device to it.
    ```
 
 1. weblink will output a URL that you need to open on the device you want to use
-   as a proxy.
+   as a proxy. Your web browser will be used as a proxy, so make sure that it's
+   running all the time.
 
-1. Now weblink is ready. Change proxy settings in your browser:
+1. Now weblink is ready. Change the proxy settings in your browser:
 
    |||
    |---|---|
-   | type | `HTTPS` |
-   | host | `127.0.0.1` |
-   | port | `3128` |
+   | proxy type | `HTTPS` |
+   | proxy host | `127.0.0.1` |
+   | proxy port | `3128` |
 
    It's highly recommended to let the proxy resolve domain names.
 
