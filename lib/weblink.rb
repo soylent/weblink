@@ -16,11 +16,17 @@ class Weblink
     trap(:EXIT) { Process.waitall }
 
     if @opts[:client]
-      public = File.expand_path('../public', __dir__)
-      spawn('ruby', '-run', '-ehttpd', '--', public, err: IO::NULL)
-
-      ip = Socket.getifaddrs.find { |ifa| ifa.addr.ipv4_private? }
-      puts "Open http://#{ip.addr.ip_address}:8080/ on your other device." if ip
+      ip = Socket.getifaddrs.find { |ifa| ifa.addr&.ipv4_private? }
+      if ip
+        public = File.expand_path('../public', __dir__)
+        spawn('ruby', '-run', '-ehttpd', '--', public, err: IO::NULL)
+        puts "Open http://#{ip.addr.ip_address}:8080/ on your other device."
+      else
+        abort(
+          "Could not find an interface to listen on. " \
+          "Make sure that you are connected to your device."
+        )
+      end
     end
 
     if @opts[:server]
