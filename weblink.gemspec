@@ -12,4 +12,5 @@ Gem::Specification.new do |s|
   s.executables = 'weblink'
   s.required_ruby_version = '>= 2.5.0'
   s.add_dependency 'em-websocket', '~> 0.5'
+  s.add_dependency 'webrick', '~> 1.7'
 end
