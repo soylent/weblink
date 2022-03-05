@@ -11,12 +11,6 @@ Simply, start weblink and connect your device to it.
    rubyinstaller.org, download *ruby+devkit* and install it. You need version
    2.5 or higher. Then open Command Prompt and follow the instructions bellow.
 
-- (Windows only) Install eventmachine
-
-   ```
-   gem install eventmachine --platform=ruby
-   ```
-
 1. Install weblink
 
    ```
