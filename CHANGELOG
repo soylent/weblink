@@ -1,3 +1,7 @@
+1.1.2
+
+* Add webrick as a runtime dependency
+
 1.1.1
 
 * Ignore interfaces with nil addresses
