@@ -1,19 +1,22 @@
 var noSleep = new NoSleep();
-var noWakeEnabled = false;
-var noWakeElement = document.querySelector("#nowake");
+var noSleepCheckbox = document.getElementById("nosleep");
 
-noWakeElement.addEventListener('click', function() {
-  if (!noWakeEnabled) {
-    noSleep.enable();
-    noWakeEnabled = true;
-    noWakeElement.textContent = "Screen Awake! Click to disable";
-    noWakeElement.style.backgroundColor = "#3f9cff";
-    noWakeElement.style.color = "#FFFFFF"
-  } else {
+document.addEventListener("visibilitychange", function resetNoSleep(event) {
+  if (document.visibilityState === "visible") {
     noSleep.disable();
-    noWakeEnabled = false;
-    noWakeElement.textContent = "Click to prevent screen from sleeping";
-    noWakeElement.style.backgroundColor = "white";
-    noWakeElement.style.color = "#000000"
+    noSleep = new NoSleep();
+    noSleepCheckbox.checked = false;
   }
-}, false);
+});
+
+noSleepCheckbox.addEventListener("click", function toggleNoSleep(event) {
+  if (noSleep.isEnabled) {
+    noSleep.disable();
+  } else {
+    try {
+      noSleep.enable();
+    } catch (error) {
+      event.preventDefault();
+    }
+  }
+});
