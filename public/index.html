@@ -31,13 +31,14 @@
     </div>
 
     <script>
-      function connect(client_addr, server_addr, proxy) {
-        var client, server = new WebSocket(server_addr + "/proxy/" + proxy);
+      function connect(clientAddr, serverAddr, proxy) {
+        var client;
+        var server = new WebSocket(serverAddr + "/proxy/" + proxy);
 
         server.onerror = function(event) { console.error("server/error"); };
 
         server.onopen = function() {
-          client = new WebSocket(client_addr + "/client");
+          client = new WebSocket(clientAddr + "/client");
 
           client.onerror =  function(event) { console.error("client/error"); };
 
@@ -63,16 +64,16 @@
         params[key] = decodeURIComponent(value);
       });
 
-      var client_addr = "ws://" + location.hostname + ":8000";
-      var server_addr = params.server || "wss://weblinkapp.herokuapp.com";
-      var batch_size = Number(params.batch) || 4;
-      var control = new WebSocket(client_addr + "/control");
+      var clientAddr = "ws://" + location.hostname + ":8000";
+      var serverAddr = params.server || "wss://weblinkapp.herokuapp.com";
+      var batchSize = Number(params.batch) || 4;
+      var control = new WebSocket(clientAddr + "/control");
 
       control.onerror = function(event) { console.error("control/error"); };
       control.onclose = function(event) { console.log("control/close"); };
       control.onmessage = function(msg) {
-        for (var i = 0; i < batch_size; i++) {
-          connect(client_addr, server_addr, msg.data);
+        for (var i = 0; i < batchSize; i++) {
+          connect(clientAddr, serverAddr, msg.data);
         }
       };
     </script>

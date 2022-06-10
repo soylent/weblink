@@ -59,11 +59,11 @@ class Weblink
   private
 
   def start_client(control_ws, min_ws_num: 3)
-    host, port = @opts.values_at(:proxy_host, :proxy_port)
-    sig = EventMachine.start_server(host, port, Relay, 'client') do |rel|
+    type, host, port = @opts.values_at(:proxy_type, :proxy_host, :proxy_port)
+    sig = EventMachine.start_server(host, port, Relay, 'client') do |relay|
       # Dogpile effect
-      control_ws.send_text(@opts[:proxy_type]) if @websockets.size < min_ws_num
-      @websockets.pop { |ws| rel.start(ws) }
+      control_ws.send_text(type) if @websockets.size < min_ws_num
+      @websockets.pop { |ws| relay.start(ws) }
     end
     control_ws.onclose { EventMachine.stop_server(sig) }
   end
@@ -75,8 +75,8 @@ class Weblink
     end
     xff = handshake.headers_downcased['x-forwarded-for']
     with_retry(timeout: 3) do
-      EventMachine.connect(socket, Relay, 'server', xff) do |rel|
-        rel.start(ws)
+      EventMachine.connect(socket, Relay, 'server', xff) do |relay|
+        relay.start(ws)
       end
     end
   end
