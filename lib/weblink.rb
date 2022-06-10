@@ -77,6 +77,11 @@ class Weblink
     with_retry(timeout: 3) do
       EventMachine.connect(socket, Relay, 'server', xff) do |relay|
         relay.start(ws)
+        # TODO: Instead of creating a timer per websocket, it might be more
+        # efficient to create a single timer and iterate over all open
+        # websockets.
+        timer = EventMachine.add_periodic_timer(45) { ws.ping }
+        ws.onclose { timer.cancel }
       end
     end
   end

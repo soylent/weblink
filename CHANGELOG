@@ -1,6 +1,7 @@
 Unreleased
 
 * Prevent screen from sleeping (@zakir8)
+* Send pings to keep websockets alive
 
 1.1.2
 
