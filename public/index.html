@@ -2,27 +2,34 @@
 <html>
   <head>
     <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>weblink</title>
     <link rel="manifest" href="/weblink.webmanifest">
     <style>
       html, body {
         height: 100%;
+        background-color: #3f9cff;
+        font-family: sans-serif;
       }
       body {
         align-items: center;
-        background-color: #3f9cff;
         color: white;
         display: flex;
         justify-content: center;
+        flex-direction: column;
       }
       h1 {
-        font-family: sans-serif;
-        font-size: 8em;
+        font-size: 3rem;
       }
     </style>
   </head>
   <body>
     <h1>weblink</h1>
+    <div class="settings">
+      <input type="checkbox" id="nosleep" />
+      <label for="nosleep">Prevent screen from sleeping</label>
+    </div>
+
     <script>
       function connect(client_addr, server_addr, proxy) {
         var client, server = new WebSocket(server_addr + "/proxy/" + proxy);
@@ -70,4 +77,10 @@
       };
     </script>
   </body>
+  <script
+    src="https://cdnjs.cloudflare.com/ajax/libs/nosleep/0.12.0/NoSleep.min.js"
+    type="text/javascript"
+    crossorigin="anonymous"
+  ></script>
+  <script src="index.js" type="text/javascript"></script>
 </html>

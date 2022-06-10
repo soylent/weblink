@@ -1,3 +1,7 @@
+Unreleased
+
+* Prevent screen from sleeping (@zakir8)
+
 1.1.2
 
 * Add webrick as a runtime dependency
