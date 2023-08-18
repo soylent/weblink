@@ -32,7 +32,7 @@ class Relay < EventMachine::Connection
 
   def unbind
     log('close')
-    # Status code 1000 indicates indicates a normal closure.
+    # Status code 1000 indicates a normal closure.
     @websocket&.close(1000) if @websocket&.state == :connected
   end
 
