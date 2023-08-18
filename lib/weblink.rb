@@ -20,10 +20,10 @@ class Weblink
       if ip
         public = File.expand_path('../public', __dir__)
         spawn('ruby', '-run', '-ehttpd', '--', public, err: IO::NULL)
-        puts "Open http://#{ip.addr.ip_address}:8080/ on your other device."
+        puts "[~] Open http://#{ip.addr.ip_address}:8080/ on your other device."
       else
         abort(
-          "Could not find an interface to listen on. " \
+          "[-] Could not find an interface to listen on. " \
           "Make sure that you are connected to your device."
         )
       end
@@ -33,7 +33,7 @@ class Weblink
       begin
         spawn('proxxxy', "https://#{@https.path}", "socks5://#{@socks5.path}")
       rescue Errno::ENOENT
-        abort('Please install proxxxy v2 to run weblink server')
+        abort('[-] Install proxxy v2 to run weblink server.')
       end
     end
 
@@ -42,7 +42,6 @@ class Weblink
         case handshake.path
         when '/control'
           start_client(ws)
-          puts 'Ready'
         when '/client'
           @websockets.push(ws)
         when '/proxy/socks5'
@@ -50,7 +49,7 @@ class Weblink
         when '/proxy/https'
           proxy(ws, handshake, @https.path)
         else
-          warn("Unexpected request: #{handshake.path.inspect}")
+          warn("[!] Unexpected request: #{handshake.path.inspect}")
         end
       end
     end
@@ -66,11 +65,12 @@ class Weblink
       @websockets.pop { |ws| relay.start(ws) }
     end
     control_ws.onclose { EventMachine.stop_server(sig) }
+    puts "[+] Ready: #{type} proxy is listening on #{host}:#{port}."
   end
 
   def proxy(ws, handshake, socket)
     unless @opts[:server]
-      warn 'weblink server is disabled'
+      warn '[!] weblink server is disabled.'
       return
     end
     xff = handshake.headers_downcased['x-forwarded-for']
