@@ -7,12 +7,25 @@ Simply start weblink and connect your device to it.
 
 ## Installation
 
-- (Windows only) weblink requires Ruby to run. You have two options:
-  A. Install [WSL](https://docs.microsoft.com/en-us/windows/wsl/install) and
-  then install Ruby.
-  B. Go to [rubyinstaller.org](https://rubyinstaller.org), download
-  *ruby+devkit* version 2.5 or higher, and install it. Then open Command Prompt
-  and follow the instructions bellow.
+
+1. Install Ruby
+
+   - Windows. You have two options:
+
+     A. Go to [rubyinstaller.org](https://rubyinstaller.org), download
+     *ruby+devkit* version 2.5 or higher, and install it.
+
+     B. Alternatively, use the Windows Package Manager CLI:
+
+     ```
+     winget install RubyInstallerTeam.Ruby
+     ```
+
+   - macOS. Ruby is already pre-installed.
+
+   - Linux. You've got this.
+
+   Open Command Prompt or Terminal and follow the instructions bellow.
 
 1. Install weblink
 
