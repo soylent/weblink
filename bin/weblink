@@ -26,11 +26,11 @@ op = OptionParser.new do |op|
     opts[:server] = true
   end
 
-  op.on('-a', '--host HOST', String, 'Address to bind to (default: 0.0.0.0)') do |host|
+  op.on('-h', '--host HOST', String, 'Address to bind server to (default: 0.0.0.0)') do |host|
     opts[:host] = host
   end
 
-  op.on('-p', '--port PORT', Integer, 'Use PORT (default: 8000)') do |port|
+  op.on('-p', '--port PORT', Integer, 'Server PORT (default: 8000)') do |port|
     opts[:port] = port
   end
 
@@ -39,21 +39,21 @@ op = OptionParser.new do |op|
     opts[:proxy_type] = type
   end
 
-  op.on('--proxy-host HOST', String, 'Address to bind proxy to(default: 0.0.0.0)') do |host|
+  op.on('--proxy-host HOST', String, 'Address to bind proxy to (default: 0.0.0.0)') do |host|
     opts[:proxy_host] = host
   end
 
-  op.on('--proxy-port PORT', Integer, 'Use proxy PORT (default: 3128)') do |port|
+  op.on('--proxy-port PORT', Integer, 'Proxy PORT (default: 3128)') do |port|
     opts[:proxy_port] = port
   end
 
-  op.on('-v', '--version', 'Show version and exit') do
+  op.on('--version', 'Show version and exit') do
     version = File.expand_path('../VERSION', __dir__)
     puts(File.read(version))
     exit
   end
 
-  op.on_tail('-h', '--help', 'Print this help') do
+  op.on_tail('--help', 'Print this help') do
     puts(op)
     exit
   end
