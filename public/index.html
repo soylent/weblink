@@ -31,48 +31,64 @@
     </div>
 
     <script>
-      function connect(clientAddr, serverAddr, proxy) {
+      function connect(clientAddr, serverAddr, proxyType) {
         var client;
-        var server = new WebSocket(serverAddr + "/proxy/" + proxy);
-
-        server.onerror = function(event) { console.error("server/error"); };
-
-        server.onopen = function() {
-          client = new WebSocket(clientAddr + "/client");
-
-          client.onerror =  function(event) { console.error("client/error"); };
-
-          client.onopen = function() {
-            client.onmessage = function(msg) { server.send(msg.data); };
-            server.onmessage = function(msg) { client.send(msg.data); };
-          };
-
-          client.onclose = function(event) {
-            console.log("client/close", event.code, event.reason);
-            if (server.readyState === WebSocket.OPEN) server.close();
-          };
+        // Connect to the server first, so that when we connect to the
+        // client the whole chain is ready to use immediately.
+        var server = new WebSocket(serverAddr + "/proxy/" + proxyType);
+        // Log server errors.
+        server.onerror = function(event) {
+          console.error("server/error", event.code, event.reason);
         };
-
+        // When the server closes its websocket, close the corresponding
+        // client websocket too.
         server.onclose = function(event) {
           console.log("server/close", event.code, event.reason);
           if (client.readyState === WebSocket.OPEN) client.close();
         };
+        server.onopen = function() {
+          // Connect to the client.
+          client = new WebSocket(clientAddr + "/client");
+          // Log client errors.
+          client.onerror =  function(event) {
+            console.error("client/error", event.code, event.reason);
+          };
+          // When the client closes its websocket, close the corresponding
+          // server websocket too.
+          client.onclose = function(event) {
+            console.log("client/close", event.code, event.reason);
+            if (server.readyState === WebSocket.OPEN) server.close();
+          };
+          // Connect the client and server websockets.
+          client.onopen = function() {
+            client.onmessage = function(msg) { server.send(msg.data); };
+            server.onmessage = function(msg) { client.send(msg.data); };
+          };
+        };
       }
-
+      // Get the query params.
       var params = {};
       window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/g, function(m, key, value) {
         params[key] = decodeURIComponent(value);
       });
-
+      // Client address
       var clientAddr = "ws://" + location.hostname + ":8000";
+      // Server address
       var serverAddr = params.server || "wss://weblinkapp.herokuapp.com";
-      var batchSize = Number(params.batch) || 4;
+      // The number of new connections to open when we need more.
+      var connectionBatchSize = Number(params.connection_batch_size) || 4;
+      // Establish a control websocket to receive commands.
       var control = new WebSocket(clientAddr + "/control");
-
-      control.onerror = function(event) { console.error("control/error"); };
-      control.onclose = function(event) { console.log("control/close"); };
+      // Log control errors.
+      control.onerror = function(event) {
+        console.error("control/error", event.code, event.reason);
+      };
+      control.onclose = function(event) {
+        console.log("control/close", event.code, event.reason);
+      };
+      // Add more connections on demand.
       control.onmessage = function(msg) {
-        for (var i = 0; i < batchSize; i++) {
+        for (var i = 0; i < connectionBatchSize; i++) {
           connect(clientAddr, serverAddr, msg.data);
         }
       };

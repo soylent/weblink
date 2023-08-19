@@ -68,25 +68,25 @@ class Weblink
     puts "[+] Ready: #{type} proxy is listening on #{host}:#{port}."
   end
 
-  def proxy(ws, handshake, socket)
+  def proxy(ws, handshake, socket, ping_interval: 45)
     unless @opts[:server]
       warn '[!] weblink server is disabled.'
       return
     end
     xff = handshake.headers_downcased['x-forwarded-for']
-    with_retry(timeout: 3) do
+    with_retry do
       EventMachine.connect(socket, Relay, 'server', xff) do |relay|
         relay.start(ws)
         # TODO: Instead of creating a timer per websocket, it might be more
         # efficient to create a single timer and iterate over all open
         # websockets.
-        timer = EventMachine.add_periodic_timer(45) { ws.ping }
+        timer = EventMachine.add_periodic_timer(ping_interval) { ws.ping }
         ws.onclose { timer.cancel }
       end
     end
   end
 
-  def with_retry(timeout:, wait: 0.1)
+  def with_retry(timeout: 3, wait: 0.1)
     elapsed = 0
     begin
       yield
